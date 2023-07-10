@@ -1,9 +1,6 @@
 @echo off
 echo Checking if config.yaml file exists...
-if not exist config.yaml (
-    echo ERROR: config.yaml file not found. Please create the config.yaml file.
-    exit /b 1
-)
+
 echo Checking if virtual environment is activated...
 if not defined VIRTUAL_ENV (
     echo Virtual environment not activated. Creating and activating virtual environment...
