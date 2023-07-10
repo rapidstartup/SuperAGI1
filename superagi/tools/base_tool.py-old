@@ -4,6 +4,7 @@ from inspect import signature
 from typing import List
 from typing import Optional, Type, Callable, Any, Union, Dict, Tuple
 
+import yaml
 from pydantic import BaseModel, create_model, validate_arguments, Extra
 
 from superagi.config.config import get_config
@@ -16,7 +17,8 @@ class SchemaSettings:
 
 
 def extract_valid_parameters(
-    inferred_type: Type[BaseModel], function: Callable
+        inferred_type: Type[BaseModel],
+        function: Callable,
 ) -> dict:
     """Get the arguments from a function's signature."""
     schema = inferred_type.schema()["properties"]
@@ -25,7 +27,7 @@ def extract_valid_parameters(
 
 
 def _construct_model_subset(
-    model_name: str, original_model: BaseModel, required_fields: list
+        model_name: str, original_model: BaseModel, required_fields: list
 ) -> Type[BaseModel]:
     """Create a pydantic model with only a subset of model's fields."""
     fields = {
@@ -40,7 +42,8 @@ def _construct_model_subset(
 
 
 def create_function_schema(
-    schema_name: str, function: Callable
+        schema_name: str,
+        function: Callable,
 ) -> Type[BaseModel]:
     """Create a pydantic schema from a function's signature."""
     validated = validate_arguments(function, config=SchemaSettings)  # type: ignore
@@ -52,10 +55,17 @@ def create_function_schema(
         f"{schema_name}Schema", inferred_type, list(valid_parameters)
     )
 
+
 class BaseToolkitConfiguration:
+
     def get_tool_config(self, key: str):
-        # Retrieve the value associated with the given key from environment variables
-        return get_config(key)
+        # Default implementation of the tool configuration retrieval logic
+        with open("config.yaml") as file:
+            config = yaml.safe_load(file)
+
+        # Retrieve the value associated with the given key
+        return config.get(key)
+
 
 class BaseTool(BaseModel):
     name: str = None
